@@ -103,11 +103,17 @@ async function setupModelUpload(viewer) {
                 throw new Error(await resp.text());
             }
             const model = await resp.json();
-            showNotification(`Modèle <strong>${file.name}</strong> téléversé avec succès !`, 'success');
+            showNotification(`Modèle <strong>${file.name}</strong> téléversé avec succès ! Initialisation de la traduction...`, 'success');
+            
+            // CORRECTION: Attendre plus longtemps pour que l'API APS traite la traduction
             setTimeout(() => {
                 setupModelSelection(viewer, model.urn);
-                clearNotification();
-            }, 2000);
+                showNotification(`Vérification du statut de traduction...`, 'info');
+                // Démarrer immédiatement la vérification du statut
+                setTimeout(() => {
+                    onModelSelected(viewer, model.urn);
+                }, 1000);
+            }, 3000);
         } catch (err) {
             showNotification(`Impossible de téléverser le modèle <strong>${file.name}</strong>. Consultez la console pour plus de détails.`, 'error');
             console.error(err);
@@ -125,26 +131,54 @@ async function onModelSelected(viewer, urn) {
         clearTimeout(window.onModelSelectedTimeout);
         delete window.onModelSelectedTimeout;
     }
+    
+    // Initialiser le compteur de tentatives si pas déjà fait
+    if (!window.statusCheckAttempts) {
+        window.statusCheckAttempts = 0;
+    }
+    window.statusCheckAttempts++;
+    
     window.location.hash = urn;
     try {
+        console.log(`>> Status check attempt ${window.statusCheckAttempts} for URN: ${urn}`);
+        
         const resp = await fetch(`/api/models/${urn}/status`);
         if (!resp.ok) {
             throw new Error(await resp.text());
         }
         const status = await resp.json();
+        
+        console.log(`>> Status response:`, status);
+        
         switch (status.status) {
             case 'n/a':
-                showNotification(`Le modèle n'a pas été traduit. <button onclick="forceTranslation('${urn}')" style="margin-left: 10px; padding: 5px 10px; background: #ff6b35; color: white; border: none; border-radius: 3px; cursor: pointer;">🔥 Forcer la traduction</button>`, 'warning');
+                // Après 10 tentatives, arrêter et proposer le forcing
+                if (window.statusCheckAttempts >= 10) {
+                    showNotification(`Le modèle n'a pas été traduit après ${window.statusCheckAttempts} tentatives. <button onclick="forceTranslation('${urn}')" style="margin-left: 10px; padding: 5px 10px; background: #ff6b35; color: white; border: none; border-radius: 3px; cursor: pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Forcer la traduction</button>`, 'warning');
+                    window.statusCheckAttempts = 0;
+                } else {
+                    showNotification(`Attente de la traduction... (${window.statusCheckAttempts}/10)`, 'info');
+                    window.onModelSelectedTimeout = setTimeout(onModelSelected, 3000, viewer, urn);
+                }
                 break;
             case 'inprogress':
-                showNotification(`Le modèle est en cours de traduction (${status.progress})...`, 'info');
-                window.onModelSelectedTimeout = setTimeout(onModelSelected, 5000, viewer, urn);
+                showNotification(`Le modèle est en cours de traduction (${status.progress})... (${window.statusCheckAttempts}/50)`, 'info');
+                // Timeout de sécurité : arrêter après 50 tentatives (4+ minutes)
+                if (window.statusCheckAttempts < 50) {
+                    window.onModelSelectedTimeout = setTimeout(onModelSelected, 5000, viewer, urn);
+                } else {
+                    showNotification(`Timeout: La traduction prend trop de temps. <button onclick="forceTranslation('${urn}')" style="margin-left: 10px; padding: 5px 10px; background: #ff6b35; color: white; border: none; border-radius: 3px; cursor: pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Relancer</button>`, 'error');
+                    window.statusCheckAttempts = 0;
+                }
                 break;
             case 'failed':
                 showNotification(`Échec de la traduction. <ul>${status.messages.map(msg => `<li>${JSON.stringify(msg)}</li>`).join('')}</ul>`, 'error');
+                window.statusCheckAttempts = 0;
                 break;
             default:
+                console.log(`>> Translation completed! Loading model...`);
                 clearNotification();
+                window.statusCheckAttempts = 0;
                 loadModel(viewer, urn);
                 // Notifier les extensions qu'un nouveau modèle est chargé
                 if (viewer.getExtension('OTEISExtension')) {
@@ -158,8 +192,9 @@ async function onModelSelected(viewer, urn) {
                 break; 
         }
     } catch (err) {
+        console.error(`>> Status check error:`, err);
         showNotification('Impossible de charger le modèle. Consultez la console pour plus de détails.', 'error');
-        console.error(err);
+        window.statusCheckAttempts = 0;
     }
 }
 
@@ -206,7 +241,16 @@ window.getCurrentViewer = () => currentViewer;
 // FONCTION DE FORCING: Force la retraduction d'un modèle
 async function forceTranslation(urn) {
     try {
-        showNotification('Forcing de la traduction en cours...', 'info');
+        showNotification(`
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 20px; height: 20px; border: 2px solid #007ACC; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <span>Forcing de la conversion en cours...</span>
+            </div>
+            <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+        `, 'info');
+        
+        // Reset le compteur de tentatives
+        window.statusCheckAttempts = 0;
         
         const resp = await fetch(`/api/models/${urn}/force-translate`, { 
             method: 'POST',
@@ -219,16 +263,32 @@ async function forceTranslation(urn) {
         }
         
         const result = await resp.json();
-        showNotification('Traduction forcée avec succès ! Vérification du statut...', 'success');
+        console.log('>> Force translation result:', result);
         
-        // Attendre 3 secondes puis vérifier le statut
+        showNotification(`
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#28a745">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Conversion forcée avec succès ! Vérification du statut...</span>
+            </div>
+        `, 'success');
+        
+        // Attendre 5 secondes puis vérifier le statut
         setTimeout(() => {
             onModelSelected(currentViewer, urn);
-        }, 3000);
+        }, 5000);
         
     } catch (err) {
-        showNotification('Erreur lors du forcing: ' + err.message, 'error');
-        console.error('Force translation error:', err);
+        console.error('>> Force translation error:', err);
+        showNotification(`
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#dc3545">
+                    <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+                <span>Erreur lors du forcing: ${err.message}</span>
+            </div>
+        `, 'error');
     }
 }
 
