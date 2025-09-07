@@ -89,7 +89,7 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
             return;
         }
 
-        console.log("Parsing des éléments du modèle en cours...");
+        console.log("🔍 Parsing des éléments du modèle en cours...");
         
         return new Promise((resolve) => {
             const tree = this.viewer.model.getData().instanceTree;
@@ -112,7 +112,7 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
                 allDbIds.push(dbId);
             }, true);
 
-            console.log(`Analyse de ${allDbIds.length} éléments...`);
+            console.log(`📊 Analyse de ${allDbIds.length} éléments...`);
             
             let processedCount = 0;
 
@@ -157,7 +157,7 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
                         this.modelElements = elements;
                         this.modelSummary = this.createModelSummary(elements, categories, materials, families);
                         
-                        console.log("Parsing terminé:", {
+                        console.log("✅ Parsing terminé:", {
                             totalElements: elements.size,
                             categories: categories.size,
                             materials: materials.size,
@@ -264,67 +264,8 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
             this.toolbarGroup = toolbarGroup;
             
             this.button = new Autodesk.Viewing.UI.Button('chatbot-button');
-            this.button.setToolTip('Assistant IA');
-            
-            // Approche plus agressive - remplacer complètement le contenu du bouton
+            this.button.setToolTip('Assistant IA - ChatBot');
             this.button.setIcon('adsk-icon-help');
-            
-            // Attendre et forcer l'icône
-            setTimeout(() => {
-                // Essayer plusieurs sélecteurs
-                const buttonElement = this.button.container;
-                if (buttonElement) {
-                    // Vider complètement le bouton et ajouter notre icône
-                    buttonElement.innerHTML = `
-                        <div class="adsk-icon" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                                <!-- Tête du robot - plus grande -->
-                                <rect x="4" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <!-- Yeux - plus gros -->
-                                <circle cx="8" cy="10" r="2" fill="currentColor"/>
-                                <circle cx="16" cy="10" r="2" fill="currentColor"/>
-                                <!-- Bouche - plus visible -->
-                                <rect x="10" y="13.5" width="4" height="1.5" rx="0.7" fill="currentColor"/>
-                                <!-- Antennes - plus épaisses -->
-                                <line x1="8" y1="5" x2="8" y2="2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <line x1="16" y1="5" x2="16" y2="2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <circle cx="8" cy="2" r="1.2" fill="currentColor"/>
-                                <circle cx="16" cy="2" r="1.2" fill="currentColor"/>
-                                <!-- Corps - plus visible -->
-                                <rect x="7" y="17" width="10" height="4" rx="1.5" fill="currentColor" opacity="0.8"/>
-                            </svg>
-                        </div>
-                    `;
-                    
-                    // Garder les classes importantes
-                    buttonElement.className = 'adsk-button';
-                    
-                    console.log('Icône du chatbot forcée');
-                }
-            }, 300);
-            
-            // Double vérification après un délai plus long
-            setTimeout(() => {
-                const buttonElement = this.button.container;
-                if (buttonElement && !buttonElement.querySelector('svg')) {
-                    console.log('Tentative de récupération de l\'icône chatbot');
-                    buttonElement.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <rect x="4" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <circle cx="8" cy="10" r="2" fill="currentColor"/>
-                                <circle cx="16" cy="10" r="2" fill="currentColor"/>
-                                <rect x="10" y="13.5" width="4" height="1.5" rx="0.7" fill="currentColor"/>
-                                <line x1="8" y1="5" x2="8" y2="2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <line x1="16" y1="5" x2="16" y2="2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <circle cx="8" cy="2" r="1.2" fill="currentColor"/>
-                                <circle cx="16" cy="2" r="1.2" fill="currentColor"/>
-                                <rect x="7" y="17" width="10" height="4" rx="1.5" fill="currentColor" opacity="0.8"/>
-                            </svg>
-                        </div>
-                    `;
-                }
-            }, 1000);
             
             this.button.onClick = (event) => {
                 console.log("Bouton ChatBot cliqué");
@@ -351,24 +292,19 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
         this.button.className = "btn btn-primary";
         this.button.title = "Assistant IA - ChatBot";
         this.button.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="4" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                <circle cx="8" cy="10" r="2" fill="currentColor"/>
-                <circle cx="16" cy="10" r="2" fill="currentColor"/>
-                <rect x="10" y="13.5" width="4" height="1.5" rx="0.7" fill="currentColor"/>
-                <line x1="8" y1="5" x2="8" y2="2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <line x1="16" y1="5" x2="16" y2="2.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="8" cy="2" r="1.2" fill="currentColor"/>
-                <circle cx="16" cy="2" r="1.2" fill="currentColor"/>
-                <rect x="7" y="17" width="10" height="4" rx="1.5" fill="currentColor" opacity="0.8"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.09 0 2.14-.18 3.12-.5L20 24l-1.5-4.88C20.32 17.14 22 14.76 22 12c0-5.52-4.48-10-10-10z" stroke="currentColor" stroke-width="2" fill="none"/>
+                <circle cx="8" cy="12" r="1" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                <circle cx="16" cy="12" r="1" fill="currentColor"/>
             </svg>
             Assistant IA
         `;
         
         this.button.style.cssText = `
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            top: 70px;
+            left: 10px;
             z-index: 1000;
             opacity: 0.7;
             cursor: not-allowed;
@@ -458,61 +394,35 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
         this.panel = document.createElement("div");
         this.panel.className = "chatbot-panel";
         this.panel.style.cssText = `
-            position: absolute;
-            bottom: 5px;
-            left: 20px;
-            width: 400px;
-            height: auto;
-            min-height: 200px;
-            max-height: calc(100% - 10px);
+            position: fixed;
+            top: 60px;
+            left: 10px;
+            width: 380px;
+            height: calc(100vh - 80px);
+            max-height: 600px;
             background: var(--bg-color, #ffffff);
             color: var(--text-color, #333333);
             border: 1px solid var(--border-color, #ddd);
-            border-radius: 16px;
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             z-index: 1001;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         `;
-        
-        // Ajouter le panel au conteneur du viewer
-        const viewerContainer = document.getElementById('preview');
-        if (viewerContainer) {
-            viewerContainer.appendChild(this.panel);
-        } else {
-            document.body.appendChild(this.panel);
-        }
 
-        // Header avec poignée de redimensionnement
+        // Header
         const header = document.createElement("div");
         header.style.cssText = `
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
+            padding: 15px;
             border-bottom: 1px solid var(--border-color, #ddd);
             background: var(--header-bg, #f8f9fa);
-            border-radius: 16px 16px 0 0;
-            cursor: move;
-            position: relative;
+            border-radius: 12px 12px 0 0;
         `;
-        
-        // Ajouter une poignée de redimensionnement visuelle
-        const resizeHandle = document.createElement("div");
-        resizeHandle.style.cssText = `
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 6px;
-            background: var(--border-color, #ddd);
-            border-radius: 3px;
-            cursor: ns-resize;
-        `;
-        header.appendChild(resizeHandle);
 
         const title = document.createElement("h3");
         title.textContent = "Assistant IA";
@@ -546,8 +456,6 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
             overflow-y: auto;
             padding: 15px;
             background: #fafafa;
-            min-height: 100px;
-            max-height: none;
         `;
 
         // Input area
@@ -603,20 +511,18 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
         this.panel.appendChild(header);
         this.panel.appendChild(this.messagesContainer);
         this.panel.appendChild(inputArea);
+        document.body.appendChild(this.panel);
 
         // Message d'accueil avec contexte du modèle
         this.addWelcomeMessage();
-        
-        // Ajuster la hauteur initiale
-        setTimeout(() => this.adjustPanelHeight(), 100);
     }
 
     // NOUVELLE MÉTHODE : Message d'accueil avec contexte
     addWelcomeMessage() {
-        let welcomeMessage = "Bonjour ! Je suis votre assistant IA pour l'analyse de modèles 3D.";
+        let welcomeMessage = "🏗️ Bonjour ! Je suis votre assistant IA pour l'analyse de modèles 3D.";
         
         if (this.modelSummary) {
-            welcomeMessage += `\n\nJ'ai analysé votre modèle qui contient :\n`;
+            welcomeMessage += `\n\n📊 J'ai analysé votre modèle qui contient :\n`;
             welcomeMessage += `• ${this.modelSummary.totalElements} éléments au total\n`;
             
             if (this.modelSummary.categories.length > 0) {
@@ -631,9 +537,9 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
                 welcomeMessage += `• Niveaux : ${this.modelSummary.levels.slice(0, 3).join(', ')}\n`;
             }
             
-            welcomeMessage += `\nJe peux maintenant vous aider précisément avec ce modèle !`;
+            welcomeMessage += `\n💡 Je peux maintenant vous aider précisément avec ce modèle !`;
         } else {
-            welcomeMessage += "\n\nAnalyse du modèle en cours... Patientez un instant.";
+            welcomeMessage += "\n\n⏳ Analyse du modèle en cours... Patientez un instant.";
         }
         
         welcomeMessage += "\n\nQue puis-je faire pour vous ? (isoler, compter, analyser, colorer...)";
@@ -670,40 +576,6 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
 
         // Ajouter à l'historique
         this.chatHistory.push({ role, content });
-        
-        // Ajuster automatiquement la hauteur du panel
-        this.adjustPanelHeight();
-    }
-
-    adjustPanelHeight() {
-        if (!this.panel || !this.messagesContainer) return;
-        
-        // Calculer la hauteur nécessaire
-        const headerHeight = 60; // Header + padding
-        const inputHeight = 60; // Input area + padding
-        const messagesHeight = this.messagesContainer.scrollHeight;
-        const totalNeeded = headerHeight + messagesHeight + inputHeight + 40; // +40 pour les marges
-        
-        // Obtenir la hauteur maximale (viewer height - 10px)
-        const viewerContainer = document.getElementById('preview');
-        const maxHeight = viewerContainer ? viewerContainer.clientHeight - 10 : window.innerHeight - 200;
-        
-        // Calculer la hauteur optimale
-        const optimalHeight = Math.min(totalNeeded, maxHeight);
-        const minHeight = 200;
-        const finalHeight = Math.max(optimalHeight, minHeight);
-        
-        // Appliquer la nouvelle hauteur
-        this.panel.style.height = finalHeight + 'px';
-        
-        // Si on atteint la hauteur max, activer le scroll
-        if (totalNeeded > maxHeight) {
-            this.messagesContainer.style.overflowY = 'auto';
-            this.messagesContainer.style.maxHeight = (maxHeight - headerHeight - inputHeight - 40) + 'px';
-        } else {
-            this.messagesContainer.style.overflowY = 'visible';
-            this.messagesContainer.style.maxHeight = 'none';
-        }
     }
 
     async sendMessage() {
@@ -747,7 +619,7 @@ class ChatBotExtension extends Autodesk.Viewing.Extension {
         } else {
             this.sendButton.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="currentColor"/>
+                    <path d="m22 2-20 9 7 13 3-9 9-3z" stroke="currentColor" stroke-width="2" fill="none"/>
                 </svg>
             `;
             this.sendButton.style.cursor = "pointer";
@@ -776,21 +648,9 @@ COMMANDES DISPONIBLES - FORMAT EXACT À RESPECTER:
 
 IMPORTANT: 
 1. Tu connais maintenant EXACTEMENT quels éléments sont dans le modèle
-2. STRATÉGIE DE RECHERCHE OBLIGATOIRE - Dans l'ordre de priorité :
-   a) TOUJOURS essayer d'abord les termes ANGLAIS (car la plupart des modèles 3D utilisent l'anglais)
-   b) Si aucun résultat, essayer ensuite les termes français
-   c) Si toujours aucun résultat, essayer des variantes et synonymes
-3. EXEMPLES DE TRADUCTION AUTOMATIQUE À APPLIQUER :
-   - "murs" → essayer "wall", "walls", puis "mur", "murs"
-   - "toit" → essayer "roof", "roofing", "ceiling", puis "toit", "toiture"
-   - "porte" → essayer "door", "doors", puis "porte", "portes"
-   - "fenêtre" → essayer "window", "windows", puis "fenêtre", "fenêtres"
-   - "sol" → essayer "floor", "floors", "slab", puis "sol", "plancher"
-   - "colonne" → essayer "column", "columns", "pillar", puis "colonne", "colonnes"
-   - "poutre" → essayer "beam", "beams", puis "poutre", "poutres"
-   - "escalier" → essayer "stair", "stairs", "staircase", puis "escalier", "escaliers"
-4. Utilise ton intelligence pour mapper les termes français vers les vrais noms d'éléments EN ANGLAIS D'ABORD
-5. Si tu veux exécuter des commandes, inclus-les EXACTEMENT dans ce format JSON à la fin de ta réponse:
+2. Quand l'utilisateur dit "toit", trouve la correspondance dans les éléments réels (ex: "roof", "roofing", etc.)
+3. Utilise ton intelligence pour mapper les termes français vers les vrais noms d'éléments
+4. Si tu veux exécuter des commandes, inclus-les EXACTEMENT dans ce format JSON à la fin de ta réponse:
 COMMANDS: [{"name": "nom_commande", "params": {...}}]
 
 Réponds en français de manière naturelle et professionnelle.`;
@@ -875,11 +735,11 @@ Réponds en français de manière naturelle et professionnelle.`;
                     console.log(`Commande ${command.name} exécutée avec succès`);
                 } else {
                     console.warn(`Commande inconnue: ${command.name}`);
-                    this.addMessage("assistant", `[ERREUR] Commande inconnue: ${command.name}`);
+                    this.addMessage("assistant", `⚠️ Commande inconnue: ${command.name}`);
                 }
             } catch (error) {
                 console.error(`Erreur lors de l'exécution de ${command.name}:`, error);
-                this.addMessage("assistant", `[ERREUR] Erreur lors de l'exécution de la commande ${command.name}: ${error.message}`);
+                this.addMessage("assistant", `❌ Erreur lors de l'exécution de la commande ${command.name}: ${error.message}`);
             }
         }
     }
@@ -889,7 +749,7 @@ Réponds en français de manière naturelle et professionnelle.`;
         console.log("isolateElements appelée avec:", params);
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "[ATTENTION] Critère de recherche manquant pour l'isolation.");
+            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour l'isolation.");
             return;
         }
         
@@ -898,40 +758,40 @@ Réponds en français de manière naturelle et professionnelle.`;
         
         if (dbIds.length > 0) {
             this.viewer.isolate(dbIds);
-            this.addMessage("assistant", `[SUCCÈS] ${dbIds.length} élément(s) isolé(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `✅ ${dbIds.length} élément(s) isolé(s) avec le critère "${query}".`);
         } else {
-            this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
+            this.addMessage("assistant", `❌ Aucun élément trouvé avec le critère "${query}".`);
         }
     }
 
     async showAllElements(params) {
         console.log("showAllElements appelée");
         this.viewer.showAll();
-        this.addMessage("assistant", "Tous les éléments sont maintenant visibles.");
+        this.addMessage("assistant", "✅ Tous les éléments sont maintenant visibles.");
     }
 
     async countElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
             const totalElements = this.countAllElements();
-            this.addMessage("assistant", `Total des éléments dans le modèle: ${totalElements}`);
+            this.addMessage("assistant", `📊 Total des éléments dans le modèle: ${totalElements}`);
             return totalElements;
         }
         
         const dbIds = await this.findElementsByQuery(query);
-        this.addMessage("assistant", `${dbIds.length} élément(s) trouvé(s) avec le critère "${query}".`);
+        this.addMessage("assistant", `📊 ${dbIds.length} élément(s) trouvé(s) avec le critère "${query}".`);
         return dbIds.length;
     }
 
     async searchElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "Critère de recherche manquant.");
+            this.addMessage("assistant", "⚠️ Critère de recherche manquant.");
             return [];
         }
         
         const results = await this.findElementsByQuery(query);
-        this.addMessage("assistant", `Recherche "${query}": ${results.length} résultat(s) trouvé(s).`);
+        this.addMessage("assistant", `🔍 Recherche "${query}": ${results.length} résultat(s) trouvé(s).`);
         
         if (results.length > 0 && results.length <= 5) {
             // Surligner les résultats
@@ -947,17 +807,17 @@ Réponds en français de manière naturelle et professionnelle.`;
     async getElementProperties(params) {
         const elementId = params.elementId || params.dbId;
         if (!elementId) {
-            this.addMessage("assistant", "ID d'élément manquant.");
+            this.addMessage("assistant", "⚠️ ID d'élément manquant.");
             return null;
         }
         
         return new Promise((resolve) => {
             this.viewer.getProperties(elementId, (props) => {
                 const formattedProps = this.formatProperties(props);
-                this.addMessage("assistant", `Propriétés de l'élément ${elementId}:\n${formattedProps}`);
+                this.addMessage("assistant", `📋 Propriétés de l'élément ${elementId}:\n${formattedProps}`);
                 resolve(props);
             }, (error) => {
-                this.addMessage("assistant", `Impossible de récupérer les propriétés de l'élément ${elementId}.`);
+                this.addMessage("assistant", `❌ Impossible de récupérer les propriétés de l'élément ${elementId}.`);
                 resolve(null);
             });
         });
@@ -966,16 +826,16 @@ Réponds en français de manière naturelle et professionnelle.`;
     async hideElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "Critère de recherche manquant pour masquer.");
+            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour masquer.");
             return;
         }
         
         const dbIds = await this.findElementsByQuery(query);
         if (dbIds.length > 0) {
             this.viewer.hide(dbIds);
-            this.addMessage("assistant", `${dbIds.length} élément(s) masqué(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `✅ ${dbIds.length} élément(s) masqué(s) avec le critère "${query}".`);
         } else {
-            this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
+            this.addMessage("assistant", `❌ Aucun élément trouvé avec le critère "${query}".`);
         }
     }
 
@@ -984,7 +844,7 @@ Réponds en français de manière naturelle et professionnelle.`;
         const color = params.color || "#ff0000";
         
         if (!query) {
-            this.addMessage("assistant", "Critère de recherche manquant pour changer la couleur.");
+            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour changer la couleur.");
             return;
         }
         
@@ -994,9 +854,9 @@ Réponds en français de manière naturelle et professionnelle.`;
             dbIds.forEach(dbId => {
                 this.viewer.setThemingColor(dbId, colorVector);
             });
-            this.addMessage("assistant", `Couleur changée pour ${dbIds.length} élément(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `🎨 Couleur changée pour ${dbIds.length} élément(s) avec le critère "${query}".`);
         } else {
-            this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
+            this.addMessage("assistant", `❌ Aucun élément trouvé avec le critère "${query}".`);
         }
     }
 
@@ -1004,7 +864,7 @@ Réponds en français de manière naturelle et professionnelle.`;
         const totalElements = this.countAllElements();
         const modelData = this.viewer.model.getData();
         
-        let info = `Informations du modèle:\n`;
+        let info = `📊 Informations du modèle:\n`;
         info += `• Éléments total: ${totalElements}\n`;
         info += `• Modèle chargé: ${this.viewer.model ? 'Oui' : 'Non'}\n`;
         
@@ -1019,16 +879,16 @@ Réponds en français de manière naturelle et professionnelle.`;
     async zoomToElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "Critère de recherche manquant pour le zoom.");
+            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour le zoom.");
             return;
         }
         
         const dbIds = await this.findElementsByQuery(query);
         if (dbIds.length > 0) {
             this.viewer.fitToView(dbIds);
-            this.addMessage("assistant", `Zoom sur ${dbIds.length} élément(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `🔍 Zoom sur ${dbIds.length} élément(s) avec le critère "${query}".`);
         } else {
-            this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
+            this.addMessage("assistant", `❌ Aucun élément trouvé avec le critère "${query}".`);
         }
     }
 
@@ -1038,108 +898,35 @@ Réponds en français de manière naturelle et professionnelle.`;
 
     async toggleLayer(params) {
         const layerName = params.layerName || params.name;
-        this.addMessage("assistant", `Basculement de la couche "${layerName}" en cours de développement.`);
+        this.addMessage("assistant", `🔧 Basculement de la couche "${layerName}" en cours de développement.`);
     }
 
     async measureDistance(params) {
         try {
             await this.viewer.loadExtension('Autodesk.Measure');
-            this.addMessage("assistant", "Outil de mesure activé. Cliquez sur deux points pour mesurer la distance.");
+            this.addMessage("assistant", "📏 Outil de mesure activé. Cliquez sur deux points pour mesurer la distance.");
         } catch (error) {
-            this.addMessage("assistant", "Impossible de charger l'outil de mesure.");
+            this.addMessage("assistant", "❌ Impossible de charger l'outil de mesure.");
         }
     }
 
     async createSection(params) {
         try {
             await this.viewer.loadExtension('Autodesk.Section');
-            this.addMessage("assistant", "Outil de coupe activé. Utilisez les contrôles pour créer une section.");
+            this.addMessage("assistant", "✂️ Outil de coupe activé. Utilisez les contrôles pour créer une section.");
         } catch (error) {
-            this.addMessage("assistant", "Impossible de charger l'outil de coupe.");
+            this.addMessage("assistant", "❌ Impossible de charger l'outil de coupe.");
         }
     }
 
     // FONCTIONS UTILITAIRES CORRIGÉES
     async findElementsByQuery(query) {
-        return new Promise(async (resolve) => {
+        return new Promise((resolve) => {
             if (!this.viewer.model || !query) {
                 resolve([]);
                 return;
             }
 
-            // Générer les variantes de recherche (anglais en premier)
-            const searchTerms = this.generateSearchTerms(query);
-            console.log(`Recherche pour "${query}" avec les termes:`, searchTerms);
-
-            let allResults = [];
-            
-            // Essayer chaque terme de recherche jusqu'à trouver des résultats
-            for (const searchTerm of searchTerms) {
-                const results = await this.searchByTerm(searchTerm);
-                if (results.length > 0) {
-                    console.log(`Résultats trouvés avec le terme "${searchTerm}": ${results.length} éléments`);
-                    allResults = results;
-                    break;
-                }
-            }
-
-            resolve(allResults);
-        });
-    }
-
-    generateSearchTerms(frenchTerm) {
-        const termLower = frenchTerm.toLowerCase();
-        const translations = {
-            'mur': ['wall', 'walls'],
-            'murs': ['wall', 'walls'],
-            'toit': ['roof', 'roofing', 'ceiling'],
-            'toiture': ['roof', 'roofing', 'ceiling'],
-            'porte': ['door', 'doors'],
-            'portes': ['door', 'doors'],
-            'fenêtre': ['window', 'windows'],
-            'fenêtres': ['window', 'windows'],
-            'sol': ['floor', 'floors', 'slab'],
-            'plancher': ['floor', 'floors', 'slab'],
-            'colonne': ['column', 'columns', 'pillar'],
-            'colonnes': ['column', 'columns', 'pillar'],
-            'poutre': ['beam', 'beams'],
-            'poutres': ['beam', 'beams'],
-            'escalier': ['stair', 'stairs', 'staircase'],
-            'escaliers': ['stair', 'stairs', 'staircase'],
-            'cloison': ['partition', 'wall', 'walls'],
-            'dalle': ['slab', 'floor', 'floors'],
-            'fondation': ['foundation', 'footing'],
-            'fondations': ['foundation', 'footing'],
-            'plafond': ['ceiling', 'roof']
-        };
-
-        let searchTerms = [];
-        
-        // 1. Ajouter d'abord les traductions anglaises si elles existent
-        if (translations[termLower]) {
-            searchTerms.push(...translations[termLower]);
-        }
-        
-        // 2. Ajouter le terme original
-        searchTerms.push(termLower);
-        
-        // 3. Si pas de traduction trouvée, ajouter des variantes communes
-        if (!translations[termLower]) {
-            // Essayer des variantes pluriel/singulier
-            if (termLower.endsWith('s')) {
-                searchTerms.push(termLower.slice(0, -1)); // enlever le 's'
-            } else {
-                searchTerms.push(termLower + 's'); // ajouter un 's'
-            }
-        }
-
-        // Supprimer les doublons
-        return [...new Set(searchTerms)];
-    }
-
-    // Méthode pour rechercher avec un terme spécifique
-    async searchByTerm(searchTerm) {
-        return new Promise((resolve) => {
             const tree = this.viewer.model.getData().instanceTree;
             if (!tree) {
                 resolve([]);
@@ -1154,9 +941,12 @@ Réponds en français de manière naturelle et professionnelle.`;
                 allDbIds.push(dbId);
             }, true);
 
+            console.log(`Recherche de "${query}" dans ${allDbIds.length} éléments`);
+            
             let processedCount = 0;
-            const queryLower = searchTerm.toLowerCase();
+            const queryLower = query.toLowerCase();
 
+            // Traitement optimisé et robuste
             if (allDbIds.length === 0) {
                 resolve([]);
                 return;
@@ -1170,6 +960,7 @@ Réponds en français de manière naturelle et professionnelle.`;
                     processedCount++;
                     
                     if (processedCount >= allDbIds.length) {
+                        console.log(`Recherche terminée. ${results.length} résultats trouvés.`);
                         resolve(results);
                     }
                 }, (error) => {
@@ -1229,7 +1020,7 @@ Réponds en français de manière naturelle et professionnelle.`;
 
     showError(message) {
         if (this.panel) {
-            this.addMessage("assistant", `${message}`);
+            this.addMessage("assistant", `❌ ${message}`);
         } else {
             const notification = document.createElement("div");
             notification.style.cssText = `

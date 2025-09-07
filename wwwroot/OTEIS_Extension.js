@@ -231,30 +231,20 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
         this.panel = document.createElement("div");
         this.panel.className = "oteis-panel";
         this.panel.style.cssText = `
-            position: absolute;
-            top: 5px;
+            position: fixed;
+            top: 60px;
             right: 10px;
-            width: 420px;
-            height: calc(100% - 10px);
+            width: 350px;
+            max-height: calc(100vh - 80px);
             background: var(--bg-color, #ffffff);
             color: var(--text-color, #333333);
             border: 1px solid var(--border-color, #ddd);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 1001;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
         `;
-        
-        // Ajouter le panel au conteneur du viewer au lieu du body
-        const viewerContainer = document.getElementById('preview');
-        if (viewerContainer) {
-            viewerContainer.appendChild(this.panel);
-        } else {
-            document.body.appendChild(this.panel);
-        }
 
         // Header du panel
         const header = document.createElement("div");
@@ -293,10 +283,11 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
 
         // Content du panel
         this.panelContent = document.createElement("div");
-        this.panelContent.style.cssText = "padding: 20px; flex: 1; overflow-y: auto;";
+        this.panelContent.style.cssText = "padding: 15px;";
 
         this.panel.appendChild(header);
         this.panel.appendChild(this.panelContent);
+        document.body.appendChild(this.panel);
     }
 
     showLoading() {
@@ -465,21 +456,10 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
                     
                     // Vérifier si tous les éléments ont été traités
                     if (processedCount >= allDbIds.length) {
-                        // Calculs supplémentaires et avancés
+                        // Calculs supplémentaires
                         const evalThermique = (surfaceTotale / 100) * 0.8; // kWh/m²
                         const recyclabilite = this.calculateRecyclability(materiaux);
                         const bilanGlobal = empreinteCarbone + (consommationEnergie * 0.5) + evalThermique;
-                        
-                        // Calculs avancés supplémentaires
-                        const masseTotale = Array.from(materiaux.values()).reduce((total, info) => 
-                            total + (info.volume * info.data.density), 0);
-                        const coutMaintenance = coutEstime * 0.15; // 15% du coût initial par an
-                        const economiesPotentielles = masseTotale * 0.02; // Économies via recyclage
-                        const emissionsCO2Annuelles = empreinteCarbone * 0.05; // 5% par an d'usage
-                        const consommationEauEstimee = surfaceTotale * 2.5; // L/m² pour construction
-                        const dureeVieEstimee = 50; // Années
-                        const impactBiodiversite = surfaceTotale * 0.1; // Score sur 100
-                        const certificationsEcolo = recyclabilite > 70 ? "Éligible HQE/BREEAM" : "Standard";
 
                         this.resultsData = {
                             elementsAnalyses,
@@ -491,16 +471,7 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
                             bilanGlobal,
                             coutEstime,
                             recyclabilite,
-                            materiaux: Array.from(materiaux.entries()),
-                            // Nouvelles données
-                            masseTotale,
-                            coutMaintenance,
-                            economiesPotentielles,
-                            emissionsCO2Annuelles,
-                            consommationEauEstimee,
-                            dureeVieEstimee,
-                            impactBiodiversite,
-                            certificationsEcolo
+                            materiaux: Array.from(materiaux.entries())
                         };
                         
                         console.log("Calculs OTEIS terminés:", this.resultsData);
@@ -612,71 +583,6 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
         return totalMass > 0 ? (recyclableMass / totalMass) * 100 : 0;
     }
 
-    // Fonctions de formatage des nombres et unités
-    formatNumber(value) {
-        if (value >= 1000000000) {
-            return (value / 1000000000).toFixed(2) + ' Md';
-        } else if (value >= 1000000) {
-            return (value / 1000000).toFixed(2) + ' M';
-        } else if (value >= 1000) {
-            return (value / 1000).toFixed(2) + ' K';
-        } else {
-            return value.toFixed(2);
-        }
-    }
-
-    formatVolume(volume) {
-        if (volume >= 1000000) {
-            return (volume / 1000000).toFixed(2) + ' Mm³';
-        } else if (volume >= 1000) {
-            return (volume / 1000).toFixed(2) + ' Km³';
-        } else {
-            return volume.toFixed(2) + ' m³';
-        }
-    }
-
-    formatSurface(surface) {
-        if (surface >= 10000) {
-            return (surface / 10000).toFixed(2) + ' ha';
-        } else if (surface >= 1000000) {
-            return (surface / 1000000).toFixed(2) + ' km²';
-        } else {
-            return surface.toFixed(2) + ' m²';
-        }
-    }
-
-    formatWeight(weight) {
-        if (weight >= 1000000) {
-            return (weight / 1000000).toFixed(2) + ' kt';
-        } else if (weight >= 1000) {
-            return (weight / 1000).toFixed(2) + ' t';
-        } else {
-            return weight.toFixed(2) + ' kg';
-        }
-    }
-
-    formatCurrency(amount) {
-        if (amount >= 1000000000) {
-            return (amount / 1000000000).toFixed(2) + ' Md €';
-        } else if (amount >= 1000000) {
-            return (amount / 1000000).toFixed(2) + ' M €';
-        } else if (amount >= 1000) {
-            return (amount / 1000).toFixed(2) + ' K €';
-        } else {
-            return amount.toFixed(2) + ' €';
-        }
-    }
-
-    formatEnergy(energy) {
-        if (energy >= 1000000) {
-            return (energy / 1000000).toFixed(2) + ' GWh';
-        } else if (energy >= 1000) {
-            return (energy / 1000).toFixed(2) + ' MWh';
-        } else {
-            return energy.toFixed(2) + ' kWh';
-        }
-    }
-
     displayResults() {
         if (!this.resultsData) return;
 
@@ -684,169 +590,57 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
         
         this.panelContent.innerHTML = `
             <div class="oteis-results">
-                <!-- Métriques principales -->
-                <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-                        </svg>
-                        Analyse Structurelle
-                    </h3>
-                    <div class="metric-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">${this.formatNumber(data.elementsAnalyses)}</div>
-                            <div class="metric-label">Éléments analysés</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${this.formatSurface(data.surfaceTotale)}</div>
-                            <div class="metric-label">Surface totale</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${this.formatVolume(data.volumeTotal)}</div>
-                            <div class="metric-label">Volume total</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">${this.formatWeight(data.masseTotale)}</div>
-                            <div class="metric-label">Masse totale</div>
-                        </div>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${data.elementsAnalyses}</div>
+                        <div class="metric-label">Éléments analysés</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${data.surfaceTotale.toFixed(1)} m²</div>
+                        <div class="metric-label">Surface totale</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${data.volumeTotal.toFixed(1)} m³</div>
+                        <div class="metric-label">Volume total</div>
+                    </div>
+                    <div class="metric-card impact">
+                        <div class="metric-value">${data.empreinteCarbone.toFixed(1)} kg</div>
+                        <div class="metric-label">CO₂ équivalent</div>
+                    </div>
+                    <div class="metric-card energy">
+                        <div class="metric-value">${data.consommationEnergie.toFixed(1)} kWh</div>
+                        <div class="metric-label">Consommation énergie</div>
+                    </div>
+                    <div class="metric-card cost">
+                        <div class="metric-value">${data.coutEstime.toFixed(0)} €</div>
+                        <div class="metric-label">Coût estimé</div>
                     </div>
                 </div>
 
-                <!-- Impact environnemental -->
                 <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                            <path d="M8 12l2 2 4-4"/>
-                        </svg>
-                        Impact Environnemental
-                    </h3>
-                    <div class="metric-grid">
-                        <div class="metric-card impact">
-                            <div class="metric-value">${this.formatWeight(data.empreinteCarbone)}</div>
-                            <div class="metric-label">CO₂ équivalent</div>
-                        </div>
-                        <div class="metric-card impact">
-                            <div class="metric-value">${this.formatWeight(data.emissionsCO2Annuelles)}</div>
-                            <div class="metric-label">CO₂ annuel (usage)</div>
-                        </div>
-                        <div class="metric-card energy">
-                            <div class="metric-value">${this.formatEnergy(data.consommationEnergie)}</div>
-                            <div class="metric-label">Consommation énergie</div>
-                        </div>
-                        <div class="metric-card energy">
-                            <div class="metric-value">${this.formatEnergy(data.evalThermique)}</div>
-                            <div class="metric-label">Évaluation thermique</div>
-                        </div>
-                        <div class="metric-card water">
-                            <div class="metric-value">${this.formatNumber(data.consommationEauEstimee)} L</div>
-                            <div class="metric-label">Consommation eau</div>
-                        </div>
-                        <div class="metric-card bio">
-                            <div class="metric-value">${data.impactBiodiversite.toFixed(1)}/100</div>
-                            <div class="metric-label">Impact biodiversité</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Analyse économique -->
-                <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                        Analyse Économique
-                    </h3>
-                    <div class="metric-grid">
-                        <div class="metric-card cost">
-                            <div class="metric-value">${this.formatCurrency(data.coutEstime)}</div>
-                            <div class="metric-label">Coût construction</div>
-                        </div>
-                        <div class="metric-card cost">
-                            <div class="metric-value">${this.formatCurrency(data.coutMaintenance)}</div>
-                            <div class="metric-label">Coût maintenance/an</div>
-                        </div>
-                        <div class="metric-card savings">
-                            <div class="metric-value">${this.formatCurrency(data.economiesPotentielles)}</div>
-                            <div class="metric-label">Économies recyclage</div>
-                        </div>
-                        <div class="metric-card time">
-                            <div class="metric-value">${data.dureeVieEstimee} ans</div>
-                            <div class="metric-label">Durée de vie</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Certifications -->
-                <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="8" r="7"/>
-                            <polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"/>
-                        </svg>
-                        Certifications
-                    </h3>
-                    <div class="certification-card">
-                        <div class="cert-status ${data.recyclabilite > 70 ? 'eligible' : 'standard'}">${data.certificationsEcolo}</div>
-                        <div class="cert-score">Score recyclabilité: ${data.recyclabilite.toFixed(1)}%</div>
-                    </div>
-                </div>
-
-                <!-- Bilan Global -->
-                <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-                        </svg>
-                        Bilan Global
-                    </h3>
+                    <h4>Bilan Global</h4>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: ${Math.min(data.bilanGlobal / 1000 * 100, 100)}%"></div>
                         <span class="progress-text">${data.bilanGlobal.toFixed(1)} points</span>
                     </div>
                 </div>
 
-                <!-- Recyclabilité -->
                 <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M7 19H4.815a1.83 1.83 0 01-1.57-.881 1.785 1.785 0 01-.004-1.784L7.196 9.5"/>
-                            <path d="M11 19h8.203a1.83 1.83 0 001.556-.89 1.784 1.784 0 000-1.775L16.804 9.5"/>
-                            <path d="M14 16l-3-3 3-3"/>
-                            <path d="M8.5 2.5L11 5 8.5 7.5"/>
-                        </svg>
-                        Recyclabilité
-                    </h3>
+                    <h4>Recyclabilité</h4>
                     <div class="progress-bar recyclability">
                         <div class="progress-fill" style="width: ${data.recyclabilite}%"></div>
                         <span class="progress-text">${data.recyclabilite.toFixed(1)}%</span>
                     </div>
                 </div>
 
-                <!-- Matériaux détaillés -->
                 <div class="section">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="9" cy="9" r="2"/>
-                            <path d="M21 15.5c-7 0-9.5-3.5-9.5-7"/>
-                        </svg>
-                        Répartition des Matériaux
-                    </h3>
+                    <h4>Répartition des matériaux</h4>
                     <div class="materials-list">
-                        ${data.materiaux.map(([name, info]) => `
+                        ${data.materiaux.slice(0, 5).map(([name, info]) => `
                             <div class="material-item">
-                                <div class="material-header">
-                                    <span class="material-name">${name}</span>
-                                    <span class="material-count">${info.count} éléments</span>
-                                </div>
-                                <div class="material-details">
-                                    <span>Surface: ${this.formatSurface(info.surface)}</span>
-                                    <span>Volume: ${this.formatVolume(info.volume)}</span>
-                                    <span>Masse: ${this.formatWeight(info.volume * info.data.density)}</span>
-                                </div>
+                                <span class="material-name">${name}</span>
+                                <span class="material-count">${info.count} éléments</span>
+                                <span class="material-surface">${info.surface.toFixed(1)} m²</span>
                             </div>
                         `).join('')}
                     </div>
@@ -854,128 +648,63 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
 
                 <div class="actions">
                     <button onclick="navigator.clipboard?.writeText(JSON.stringify(${JSON.stringify(data)}, null, 2))" 
-                            class="copy-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
-                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-                        </svg>
-                        Exporter les données
+                            style="padding: 8px 16px; background: #007ACC; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Copier les données
                     </button>
                 </div>
             </div>
 
             <style>
-                .oteis-results { 
-                    font-size: 14px; 
-                    line-height: 1.4;
-                }
-                
-                .section {
-                    margin-bottom: 24px;
-                    background: rgba(255, 255, 255, 0.05);
-                    padding: 16px;
-                    border-radius: 12px;
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                }
-                
-                .section h3 {
-                    margin: 0 0 16px 0;
-                    font-size: 16px;
-                    font-weight: 600;
-                    color: #333;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                
+                .oteis-results { font-size: 14px; }
                 .metric-grid { 
                     display: grid; 
                     grid-template-columns: repeat(2, 1fr); 
-                    gap: 12px; 
+                    gap: 10px; 
+                    margin-bottom: 20px; 
                 }
-                
                 .metric-card { 
-                    padding: 16px; 
-                    background: rgba(255, 255, 255, 0.8); 
-                    border-radius: 8px; 
+                    padding: 12px; 
+                    background: #f8f9fa; 
+                    border-radius: 4px; 
                     text-align: center;
-                    border-left: 4px solid #007ACC;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    border-left: 3px solid #007ACC;
                 }
-                
-                .metric-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-                }
-                
-                .metric-card.impact { border-left-color: #ef4444; }
-                .metric-card.energy { border-left-color: #f59e0b; }
-                .metric-card.cost { border-left-color: #10b981; }
-                .metric-card.water { border-left-color: #3b82f6; }
-                .metric-card.bio { border-left-color: #8b5cf6; }
-                .metric-card.savings { border-left-color: #059669; }
-                .metric-card.time { border-left-color: #6b7280; }
-                
+                .metric-card.impact { border-left-color: #d32f2f; }
+                .metric-card.energy { border-left-color: #f57c00; }
+                .metric-card.cost { border-left-color: #388e3c; }
                 .metric-value { 
-                    font-size: 18px; 
+                    font-size: 16px; 
                     font-weight: bold; 
-                    margin-bottom: 6px; 
-                    color: #1f2937;
+                    margin-bottom: 4px; 
                 }
-                
                 .metric-label { 
-                    font-size: 12px; 
-                    color: #6b7280; 
+                    font-size: 11px; 
+                    color: #666; 
                     text-transform: uppercase; 
-                    font-weight: 500;
                 }
-                
-                .certification-card {
-                    background: rgba(255, 255, 255, 0.8);
-                    padding: 16px;
-                    border-radius: 8px;
-                    text-align: center;
+                .section { 
+                    margin-bottom: 20px; 
                 }
-                
-                .cert-status {
-                    font-size: 18px;
-                    font-weight: bold;
-                    margin-bottom: 8px;
+                .section h4 { 
+                    margin: 0 0 10px 0; 
+                    font-size: 14px; 
+                    color: #333; 
                 }
-                
-                .cert-status.eligible {
-                    color: #10b981;
-                }
-                
-                .cert-status.standard {
-                    color: #f59e0b;
-                }
-                
-                .cert-score {
-                    color: #6b7280;
-                    font-size: 14px;
-                }
-                
                 .progress-bar { 
                     position: relative; 
-                    background: rgba(0,0,0,0.1); 
-                    border-radius: 12px; 
-                    height: 24px; 
+                    background: #e0e0e0; 
+                    border-radius: 10px; 
+                    height: 20px; 
                     overflow: hidden; 
                 }
-                
                 .progress-fill { 
                     height: 100%; 
                     background: linear-gradient(90deg, #007ACC, #0099ff); 
-                    transition: width 0.5s ease; 
-                    border-radius: 12px;
+                    transition: width 0.3s ease; 
                 }
-                
                 .progress-bar.recyclability .progress-fill { 
-                    background: linear-gradient(90deg, #10b981, #34d399); 
+                    background: linear-gradient(90deg, #388e3c, #66bb6a); 
                 }
-                
                 .progress-text { 
                     position: absolute; 
                     top: 50%; 
@@ -983,70 +712,32 @@ class OTEISExtension extends Autodesk.Viewing.Extension {
                     transform: translate(-50%, -50%); 
                     color: white; 
                     font-weight: bold; 
-                    font-size: 13px; 
+                    font-size: 12px; 
                     text-shadow: 1px 1px 2px rgba(0,0,0,0.7); 
                 }
-                
                 .materials-list { 
-                    max-height: 300px; 
+                    max-height: 150px; 
                     overflow-y: auto; 
                 }
-                
                 .material-item { 
-                    background: rgba(255, 255, 255, 0.6);
-                    padding: 12px; 
-                    margin-bottom: 8px;
-                    border-radius: 8px;
-                    border: 1px solid rgba(0,0,0,0.1);
+                    display: flex; 
+                    justify-content: space-between; 
+                    padding: 6px 0; 
+                    border-bottom: 1px solid #eee; 
+                    font-size: 12px; 
                 }
-                
-                .material-header {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 8px;
-                }
-                
                 .material-name { 
-                    font-weight: 600; 
-                    color: #1f2937;
+                    flex: 1; 
+                    font-weight: 500; 
                 }
-                
-                .material-count {
-                    color: #6b7280;
-                    font-size: 12px;
-                    background: rgba(0,0,0,0.1);
-                    padding: 2px 8px;
-                    border-radius: 12px;
+                .material-count, .material-surface { 
+                    color: #666; 
+                    margin-left: 8px; 
                 }
-                
-                .material-details {
-                    display: flex;
-                    gap: 16px;
-                    font-size: 12px;
-                    color: #6b7280;
-                }
-                
-                .copy-btn {
-                    background: linear-gradient(135deg, #007ACC, #0099ff);
-                    color: white;
-                    border: none;
-                    padding: 12px 24px;
-                    border-radius: 8px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
-                }
-                
-                .copy-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(0, 122, 204, 0.4);
-                }
-                
                 .actions { 
                     text-align: center; 
-                    padding-top: 20px; 
-                    border-top: 1px solid rgba(0,0,0,0.1); 
+                    padding-top: 15px; 
+                    border-top: 1px solid #eee; 
                 }
             </style>
         `;
