@@ -134,7 +134,7 @@ async function onModelSelected(viewer, urn) {
         const status = await resp.json();
         switch (status.status) {
             case 'n/a':
-                showNotification(`Le modèle n'a pas été traduit.`, 'warning');
+                showNotification(`Le modèle n'a pas été traduit. <button onclick="forceTranslation('${urn}')" style="margin-left: 10px; padding: 5px 10px; background: #ff6b35; color: white; border: none; border-radius: 3px; cursor: pointer;">🔥 Forcer la traduction</button>`, 'warning');
                 break;
             case 'inprogress':
                 showNotification(`Le modèle est en cours de traduction (${status.progress})...`, 'info');
@@ -202,6 +202,38 @@ function clearNotification() {
 
 // Rendre le viewer accessible globalement pour les extensions
 window.getCurrentViewer = () => currentViewer;
+
+// FONCTION DE FORCING: Force la retraduction d'un modèle
+async function forceTranslation(urn) {
+    try {
+        showNotification('Forcing de la traduction en cours...', 'info');
+        
+        const resp = await fetch(`/api/models/${urn}/force-translate`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+        
+        if (!resp.ok) {
+            throw new Error(await resp.text());
+        }
+        
+        const result = await resp.json();
+        showNotification('Traduction forcée avec succès ! Vérification du statut...', 'success');
+        
+        // Attendre 3 secondes puis vérifier le statut
+        setTimeout(() => {
+            onModelSelected(currentViewer, urn);
+        }, 3000);
+        
+    } catch (err) {
+        showNotification('Erreur lors du forcing: ' + err.message, 'error');
+        console.error('Force translation error:', err);
+    }
+}
+
+// Rendre la fonction accessible globalement
+window.forceTranslation = forceTranslation;
 
 // Fonctions pour gérer l'écran d'accueil
 function showWelcomeScreen() {

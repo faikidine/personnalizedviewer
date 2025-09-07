@@ -907,31 +907,31 @@ Réponds en français de manière naturelle et professionnelle.`;
     async showAllElements(params) {
         console.log("showAllElements appelée");
         this.viewer.showAll();
-        this.addMessage("assistant", "✅ Tous les éléments sont maintenant visibles.");
+        this.addMessage("assistant", "Tous les éléments sont maintenant visibles.");
     }
 
     async countElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
             const totalElements = this.countAllElements();
-            this.addMessage("assistant", `📊 Total des éléments dans le modèle: ${totalElements}`);
+            this.addMessage("assistant", `Total des éléments dans le modèle: ${totalElements}`);
             return totalElements;
         }
         
         const dbIds = await this.findElementsByQuery(query);
-        this.addMessage("assistant", `📊 ${dbIds.length} élément(s) trouvé(s) avec le critère "${query}".`);
+        this.addMessage("assistant", `${dbIds.length} élément(s) trouvé(s) avec le critère "${query}".`);
         return dbIds.length;
     }
 
     async searchElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "⚠️ Critère de recherche manquant.");
+            this.addMessage("assistant", "Critère de recherche manquant.");
             return [];
         }
         
         const results = await this.findElementsByQuery(query);
-        this.addMessage("assistant", `🔍 Recherche "${query}": ${results.length} résultat(s) trouvé(s).`);
+        this.addMessage("assistant", `Recherche "${query}": ${results.length} résultat(s) trouvé(s).`);
         
         if (results.length > 0 && results.length <= 5) {
             // Surligner les résultats
@@ -947,17 +947,17 @@ Réponds en français de manière naturelle et professionnelle.`;
     async getElementProperties(params) {
         const elementId = params.elementId || params.dbId;
         if (!elementId) {
-            this.addMessage("assistant", "⚠️ ID d'élément manquant.");
+            this.addMessage("assistant", "ID d'élément manquant.");
             return null;
         }
         
         return new Promise((resolve) => {
             this.viewer.getProperties(elementId, (props) => {
                 const formattedProps = this.formatProperties(props);
-                this.addMessage("assistant", `📋 Propriétés de l'élément ${elementId}:\n${formattedProps}`);
+                this.addMessage("assistant", `Propriétés de l'élément ${elementId}:\n${formattedProps}`);
                 resolve(props);
             }, (error) => {
-                this.addMessage("assistant", `❌ Impossible de récupérer les propriétés de l'élément ${elementId}.`);
+                this.addMessage("assistant", `Impossible de récupérer les propriétés de l'élément ${elementId}.`);
                 resolve(null);
             });
         });
@@ -966,14 +966,14 @@ Réponds en français de manière naturelle et professionnelle.`;
     async hideElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour masquer.");
+            this.addMessage("assistant", "Critère de recherche manquant pour masquer.");
             return;
         }
         
         const dbIds = await this.findElementsByQuery(query);
         if (dbIds.length > 0) {
             this.viewer.hide(dbIds);
-            this.addMessage("assistant", `✅ ${dbIds.length} élément(s) masqué(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `${dbIds.length} élément(s) masqué(s) avec le critère "${query}".`);
         } else {
             this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
         }
@@ -984,7 +984,7 @@ Réponds en français de manière naturelle et professionnelle.`;
         const color = params.color || "#ff0000";
         
         if (!query) {
-            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour changer la couleur.");
+            this.addMessage("assistant", "Critère de recherche manquant pour changer la couleur.");
             return;
         }
         
@@ -994,7 +994,7 @@ Réponds en français de manière naturelle et professionnelle.`;
             dbIds.forEach(dbId => {
                 this.viewer.setThemingColor(dbId, colorVector);
             });
-            this.addMessage("assistant", `🎨 Couleur changée pour ${dbIds.length} élément(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `Couleur changée pour ${dbIds.length} élément(s) avec le critère "${query}".`);
         } else {
             this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
         }
@@ -1004,7 +1004,7 @@ Réponds en français de manière naturelle et professionnelle.`;
         const totalElements = this.countAllElements();
         const modelData = this.viewer.model.getData();
         
-        let info = `📊 Informations du modèle:\n`;
+        let info = `Informations du modèle:\n`;
         info += `• Éléments total: ${totalElements}\n`;
         info += `• Modèle chargé: ${this.viewer.model ? 'Oui' : 'Non'}\n`;
         
@@ -1019,14 +1019,14 @@ Réponds en français de manière naturelle et professionnelle.`;
     async zoomToElements(params) {
         const query = params.query || params.criteria;
         if (!query) {
-            this.addMessage("assistant", "⚠️ Critère de recherche manquant pour le zoom.");
+            this.addMessage("assistant", "Critère de recherche manquant pour le zoom.");
             return;
         }
         
         const dbIds = await this.findElementsByQuery(query);
         if (dbIds.length > 0) {
             this.viewer.fitToView(dbIds);
-            this.addMessage("assistant", `🔍 Zoom sur ${dbIds.length} élément(s) avec le critère "${query}".`);
+            this.addMessage("assistant", `Zoom sur ${dbIds.length} élément(s) avec le critère "${query}".`);
         } else {
             this.addMessage("assistant", `[AUCUN RÉSULTAT] Aucun élément trouvé avec le critère "${query}".`);
         }
@@ -1038,24 +1038,24 @@ Réponds en français de manière naturelle et professionnelle.`;
 
     async toggleLayer(params) {
         const layerName = params.layerName || params.name;
-        this.addMessage("assistant", `🔧 Basculement de la couche "${layerName}" en cours de développement.`);
+        this.addMessage("assistant", `Basculement de la couche "${layerName}" en cours de développement.`);
     }
 
     async measureDistance(params) {
         try {
             await this.viewer.loadExtension('Autodesk.Measure');
-            this.addMessage("assistant", "📏 Outil de mesure activé. Cliquez sur deux points pour mesurer la distance.");
+            this.addMessage("assistant", "Outil de mesure activé. Cliquez sur deux points pour mesurer la distance.");
         } catch (error) {
-            this.addMessage("assistant", "❌ Impossible de charger l'outil de mesure.");
+            this.addMessage("assistant", "Impossible de charger l'outil de mesure.");
         }
     }
 
     async createSection(params) {
         try {
             await this.viewer.loadExtension('Autodesk.Section');
-            this.addMessage("assistant", "✂️ Outil de coupe activé. Utilisez les contrôles pour créer une section.");
+            this.addMessage("assistant", "Outil de coupe activé. Utilisez les contrôles pour créer une section.");
         } catch (error) {
-            this.addMessage("assistant", "❌ Impossible de charger l'outil de coupe.");
+            this.addMessage("assistant", "Impossible de charger l'outil de coupe.");
         }
     }
 
@@ -1229,7 +1229,7 @@ Réponds en français de manière naturelle et professionnelle.`;
 
     showError(message) {
         if (this.panel) {
-            this.addMessage("assistant", `❌ ${message}`);
+            this.addMessage("assistant", `${message}`);
         } else {
             const notification = document.createElement("div");
             notification.style.cssText = `

@@ -130,19 +130,13 @@ service.getManifest = async (urn) => {
     try {
         // CORRECTION: Décoder l'URN si nécessaire
         const decodedUrn = urn.includes('%') ? decodeURIComponent(urn) : urn;
-        console.log('>> getManifest URN:', decodedUrn);
-        console.log('>> getManifest URN length:', decodedUrn.length);
+        console.log('getManifest URN:', decodedUrn);
         
         const manifest = await modelDerivativeClient.getManifest(decodedUrn, { accessToken });
-        console.log('>> Manifest found - status:', manifest.status, 'progress:', manifest.progress);
         return manifest;
     } catch (err) {
-        console.error('>> getManifest Error:', err.message);
-        console.error('>> HTTP Status:', err.axiosError?.response?.status);
-        console.error('>> Response data:', err.axiosError?.response?.data);
-        
+        console.error('getManifest Error:', err.message);
         if (err.axiosError && err.axiosError.response && err.axiosError.response.status === 404) {
-            console.log('>> Manifest not found (404) - returning null');
             return null;
         } else {
             throw err;
